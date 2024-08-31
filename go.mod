@@ -1,4 +1,4 @@
-module github.com/bjesus/erol
+module github.com/bjesus/pipet
 
 go 1.23.0
 

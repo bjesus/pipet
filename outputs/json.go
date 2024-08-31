@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"log"
 
-	"github.com/bjesus/erol/common"
+	"github.com/bjesus/pipet/common"
 )
 
-func OutputJSON(app *common.ErolApp) error {
+func OutputJSON(app *common.PipetApp) error {
 	jsonData, err := json.MarshalIndent(app.Data, "", "  ")
 	if err != nil {
 		return err

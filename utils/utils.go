@@ -3,7 +3,7 @@ package utils
 import (
 	"fmt"
 
-	"github.com/bjesus/erol/common"
+	"github.com/bjesus/pipet/common"
 )
 
 func FlattenData(data interface{}, depth int) []string {
@@ -25,7 +25,7 @@ func FlattenData(data interface{}, depth int) []string {
 	return result
 }
 
-func GetSeparator(app *common.ErolApp, depth int) string {
+func GetSeparator(app *common.PipetApp, depth int) string {
 	if depth < len(app.Separator) {
 		return app.Separator[depth]
 	}

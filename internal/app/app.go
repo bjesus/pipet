@@ -8,12 +8,12 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/bjesus/erol/common"
-	"github.com/bjesus/erol/parsers"
+	"github.com/bjesus/pipet/common"
+	"github.com/bjesus/pipet/parsers"
 	"github.com/tidwall/gjson"
 )
 
-func ParseSpecFile(e *common.ErolApp, filename string) error {
+func ParseSpecFile(e *common.PipetApp, filename string) error {
 	file, err := os.Open(filename)
 	if err != nil {
 		return err
@@ -63,7 +63,7 @@ func ParseSpecFile(e *common.ErolApp, filename string) error {
 	return scanner.Err()
 }
 
-func ExecuteBlocks(e *common.ErolApp) error {
+func ExecuteBlocks(e *common.PipetApp) error {
 	for _, block := range e.Blocks {
 		var data interface{}
 		var err error

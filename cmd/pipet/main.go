@@ -7,16 +7,16 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"github.com/bjesus/erol/common"
-	"github.com/bjesus/erol/internal/app"
-	"github.com/bjesus/erol/outputs"
+	"github.com/bjesus/pipet/common"
+	"github.com/bjesus/pipet/internal/app"
+	"github.com/bjesus/pipet/outputs"
 )
 
 func main() {
 	log.SetFlags(log.Lshortfile | log.Ltime)
 
 	app := &cli.App{
-		Name:  "erol",
+		Name:  "pipet",
 		Usage: "Easy web scraping CLI tool",
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
@@ -36,13 +36,22 @@ func main() {
 				Value: 3,
 				Usage: "Maximum number of pages to scrape",
 			},
+			&cli.IntFlag{
+				Name:  "interval",
+				Value: 3,
+				Usage: "Maximum number of pages to scrape",
+			},
+			&cli.StringFlag{
+				Name:  "on-change",
+				Usage: "Path to template file for output",
+			},
 		},
 		Action: func(c *cli.Context) error {
 			if c.NArg() == 0 {
 				return fmt.Errorf("spec argument is required")
 			}
 			spec := c.Args().Get(0)
-			return runErol(c, spec)
+			return runPipet(c, spec)
 		},
 	}
 
@@ -51,35 +60,35 @@ func main() {
 	}
 }
 
-func runErol(c *cli.Context, specFile string) error {
+func runPipet(c *cli.Context, specFile string) error {
 	jsonOutput := c.Bool("json")
 	separators := c.StringSlice("separator")
 	templateFile := c.String("template")
 	maxPages := c.Int("max-pages")
 
-	erol := &common.ErolApp{
+	pipet := &common.PipetApp{
 		MaxPages:  maxPages,
 		Separator: separators,
 	}
 
 	log.Println("Parsing spec file:", specFile)
-	err := app.ParseSpecFile(erol, specFile)
+	err := app.ParseSpecFile(pipet, specFile)
 	if err != nil {
 		return fmt.Errorf("error parsing spec file: %w", err)
 	}
 
 	log.Println("Executing blocks")
-	err = app.ExecuteBlocks(erol)
+	err = app.ExecuteBlocks(pipet)
 	if err != nil {
 		return fmt.Errorf("error executing blocks: %w", err)
 	}
 
 	log.Println("Generating output")
 	if jsonOutput {
-		return outputs.OutputJSON(erol)
+		return outputs.OutputJSON(pipet)
 	} else if templateFile != "" {
-		return outputs.OutputTemplate(erol, templateFile)
+		return outputs.OutputTemplate(pipet, templateFile)
 	} else {
-		return outputs.OutputText(erol)
+		return outputs.OutputText(pipet)
 	}
 }

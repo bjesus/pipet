@@ -7,7 +7,7 @@ type Block struct {
 	NextPage string
 }
 
-type ErolApp struct {
+type PipetApp struct {
 	Blocks    []Block
 	Data      []interface{}
 	MaxPages  int

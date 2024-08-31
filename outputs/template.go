@@ -4,10 +4,10 @@ import (
 	"html/template"
 	"os"
 
-	"github.com/bjesus/erol/common"
+	"github.com/bjesus/pipet/common"
 )
 
-func OutputTemplate(app *common.ErolApp, templateFile string) error {
+func OutputTemplate(app *common.PipetApp, templateFile string) error {
 	tmpl, err := template.ParseFiles(templateFile)
 	if err != nil {
 		return err

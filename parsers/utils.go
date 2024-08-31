@@ -8,7 +8,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/bjesus/erol/common"
+	"github.com/bjesus/pipet/common"
 	"github.com/google/shlex"
 )
 

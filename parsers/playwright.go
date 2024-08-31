@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bjesus/erol/common"
+	"github.com/bjesus/pipet/common"
 	"github.com/playwright-community/playwright-go"
 )
 
