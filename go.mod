@@ -1,6 +1,6 @@
 module github.com/bjesus/pipet
 
-go 1.23.0
+go 1.23
 
 require (
 	github.com/PuerkitoBio/goquery v1.9.2
