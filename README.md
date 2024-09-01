@@ -13,43 +13,61 @@ Pipet is a command line based web scraper. It supports three mode of operation -
 
 You can use Pipet to track a shipment, get notified when concert tickets are available, stock price changes, and any other kind of information that appears online.
 
-# Try it now
-1. Create a new Pipet spec file containing this:
-2. run `go run https://github.com/bjesus/pipet/ myfile.pipet`
+# Try it out!
+1. Create a new Pipet file containing this:
+```
+curl https://news.ycombinator.com/
+.title .titleline
+  span > a
+  .sitebit a
+```
+2. Run `go run https://github.com/bjesus/pipet/ myfile.pipet`
+3. See all of the latest hacker news in your terminal!
 
-# Pipet spec files
-The details on where the data you require exists should all be stored in Pipet spec file. This a text file normal text file containing one or more blocks, separated with an empty line. Line beginning with `#` are ignored. The first line of every block defines where the resource is and how to get it, and the following lines are the extractors, defining exactly what you'd like to take out of the resource.
+Want it as JSON? Run `go run https://github.com/bjesus/pipet/ --json myfile.pipet`! Want to template it? See more below.
+
+# Pipet files
+Pipet files describe where and how to get the data you are interested in. They are normal text files containing one or more blocks, separated with an empty line. Line beginning with `//` are ignored and can be used for comments. Every block has at least 2 sections - the first line containing the URL and the tool we are using for scraping, and the following lines describing the selectors reaching the data we would like scrap. Some blocks can end with a special last line pointing to the "next page" selector - more on that later.
+
+Below is an example Pipet file.
 
 ```
+// Read Wikipedia's "On This Day" and the subject of today's featured article
 curl https://en.wikipedia.org/wiki/Main_Page
-; read Wikipedia's "on this day" and today's feature article subject
 div#mp-otd li
   body
 div#mp-tfa > p > b > a
 
+// Get the weather in Alert, Canada
 curl https://wttr.in/Alert%20Canada?format=j1
-; how cold is it over there?
 current_condition.0.FeelsLikeC
 current_condition.0.FeelsLikeF
 
+// Check how popular the Pipet repo is
 playwright https://github.com/bjesus/pipet
-; let's get all the stars, watchers, and forks from this repro
 Array.from(document.querySelectorAll('.about-margin .Link')).map(e => e.innerText.trim()).filter(t=> /^\d/.test(t) )
 ```
 
-Blocks can start with either `curl` or `playwright`. Pipet doesn't just call these things `curl` because it's cool - it actually uses curl to fetch the resource. This might sound weird, but it's meant so that you can use your browser to find the request containing the information you are interested at, right click it, choose "Copy as cURL", and paste here. This ensures that your headers and cookies are all the same, making it very easy to get data which is behind a login page or is hidden from bots.
+Blocks can start with either `curl` or `playwright`. Pipet doesn't just call these things `curl` because it's cool - it actually uses curl to fetch the resource. This might sound weird, but it's meant so that you can use your browser to find the request containing the information you are interested in, right click it, choose "Copy as cURL", and paste in your Pipet file. This ensures that your headers and cookies are all the same, making it very easy to get data which is behind a login page or is hidden from bots.
 
-Starting a block with `playwright` will download a headless browser to your computer and start it with the specified URL.
+Starting a block with `playwright` will use a headless browser to navigate to the specified URL.
 
 The lines following the first line are your _queries_. There are 3 different type of queries - for HTML files, for JSON files, and for websites loaded using `playwright`.
 
 ## HTML Queries
+HTML Queries use CSS Selectors to point select specific elements. Whitespace nesting is used for iterations - parent lines will run as iterators, making their children lines run for each occurance of the parent selector. This means that you can use nesting to determine the structure of your final output. When writing your child selectors, note that the whole document isn't available anymore, and only the parent document is present during the iteration.
+
+By defult, Pipet will return the `innerText` of your elements. If you need to another piece of data, use Pipes. When piping HTML elements, Pipet will pipe the element's complete HTML to the receiving program.
 
 ## JSON Queries
+JSON Queries use GJSON to point select specific elements. Here too, whitespace nesting is used for iterations - parent lines will run as iterators, making their children lines run for each occurance of the parent selector. If you don't like GJSON, you can always use Pipes extract your data in other ways, for example with `jq`. See more examples below.
+
+When using pipes with to send data to program that return valid JSON, Pipet will parse the JSON and embed it in its final output.
 
 ## Playwright Queries
+Playwright Queries are different and do not use whitespace nesting. Instead, queries here are simply JavaScript code that will be evaluated after the webpage loaded. If the JavaScript code returns something that can be serialized as JSON, it will be included in Pipet's output. Otherwise, you can write JavaScript that will click, scroll or perform any othe action you might want.
 
-## Pipes
+## Unix Pipes
 Sometimes CSS Selectors and GJSON aren't enough, or perhaps you just prefer using something you already know. This is why unix pipes are first class citizen in Pipet.
 
 ```
