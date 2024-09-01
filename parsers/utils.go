@@ -26,7 +26,6 @@ func ExecuteCurlBlock(block common.Block) (interface{}, error) {
 		return nil, fmt.Errorf("curl command failed: %w\nOutput: %s", err, string(output))
 	}
 
-	fmt.Println(string(output))
 	isJSON := json.Valid(bytes.TrimSpace(output))
 	log.Println(isJSON)
 	if isJSON {
