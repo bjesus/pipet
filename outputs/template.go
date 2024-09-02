@@ -1,17 +1,15 @@
 package outputs
 
 import (
+	"bytes"
 	"html/template"
-	"os"
 
 	"github.com/bjesus/pipet/common"
 )
 
-func OutputTemplate(app *common.PipetApp, templateFile string) error {
-	tmpl, err := template.ParseFiles(templateFile)
-	if err != nil {
-		return err
-	}
-
-	return tmpl.Execute(os.Stdout, app.Data)
+func OutputTemplate(app *common.PipetApp, templateFile string) string {
+	tmpl, _ := template.ParseFiles(templateFile)
+	var doc bytes.Buffer
+	tmpl.Execute(&doc, app.Data)
+	return doc.String()
 }

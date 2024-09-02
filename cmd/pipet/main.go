@@ -4,6 +4,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/urfave/cli/v2"
 
@@ -38,7 +42,7 @@ func main() {
 			},
 			&cli.IntFlag{
 				Name:  "interval",
-				Value: 3,
+				Value: 0,
 				Usage: "Maximum number of pages to scrape",
 			},
 			&cli.StringFlag{
@@ -64,7 +68,9 @@ func runPipet(c *cli.Context, specFile string) error {
 	jsonOutput := c.Bool("json")
 	separators := c.StringSlice("separator")
 	templateFile := c.String("template")
+	onChange := c.String("on-change")
 	maxPages := c.Int("max-pages")
+	interval := c.Int("interval")
 
 	pipet := &common.PipetApp{
 		MaxPages:  maxPages,
@@ -77,18 +83,41 @@ func runPipet(c *cli.Context, specFile string) error {
 		return fmt.Errorf("error parsing spec file: %w", err)
 	}
 
-	log.Println("Executing blocks")
-	err = app.ExecuteBlocks(pipet)
-	if err != nil {
-		return fmt.Errorf("error executing blocks: %w", err)
-	}
+	iterate := true
+	previousValue := ""
 
-	log.Println("Generating output")
-	if jsonOutput {
-		return outputs.OutputJSON(pipet)
-	} else if templateFile != "" {
-		return outputs.OutputTemplate(pipet, templateFile)
-	} else {
-		return outputs.OutputText(pipet)
+	for iterate {
+		newValue := ""
+		log.Println("Executing blocks")
+		err = app.ExecuteBlocks(pipet)
+		if err != nil {
+			return fmt.Errorf("error executing blocks: %w", err)
+		}
+
+		log.Println("Generating output")
+		if jsonOutput {
+			newValue = outputs.OutputJSON(pipet)
+		} else if templateFile != "" {
+			newValue = outputs.OutputTemplate(pipet, templateFile)
+		} else {
+			newValue = outputs.OutputText(pipet)
+		}
+
+		fmt.Print(newValue)
+
+		if interval > 0 {
+			if onChange != "" && previousValue != newValue {
+				command := strings.ReplaceAll(onChange, "{}", strconv.Quote(newValue))
+				log.Println("Executing on change command: " + command)
+				cmd := exec.Command("bash", "-c", command)
+				cmd.Output()
+				previousValue = newValue
+			}
+			pipet.Data = []interface{}{}
+			time.Sleep(time.Duration(interval) * time.Second)
+		} else {
+			iterate = false
+		}
 	}
+	return nil
 }
