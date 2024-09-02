@@ -14,20 +14,91 @@ Pipet is a command line based web scraper. It supports three mode of operation -
 You can use Pipet to track a shipment, get notified when concert tickets are available, stock price changes, and any other kind of information that appears online.
 
 # Try it out!
-1. Create a new Pipet file containing this:
+1. Create a `hackernews.pipet` file containing this:
 ```
 curl https://news.ycombinator.com/
 .title .titleline
   span > a
   .sitebit a
 ```
-2. Run `go run github.com/bjesus/pipet/cmd/pipet@latest myfile.pipet`
+2. Run `go run github.com/bjesus/pipet/cmd/pipet@latest hackernews.pipet` or install Pipet and run `pipet hackernews.pipet`
 3. See all of the latest hacker news in your terminal!
 
-<details><summary>Get as JSON</summary>Add the `--json` flag to make Pipet, like `go run github.com/bjesus/pipet/cmd/pipet@latest --json myfile.pipet` or `pipet --json myfile.file`</details>
-<details><summary>Render to a template</summary>Peek a boo!</details>
-<details><summary>Use pipes</summary>Peek a boo!</details>
-<details><summary>Monitor for changes</summary>Peek a boo!</details>
+<details><summary>Get as JSON</summary>
+  
+Use the `--json` flag to make Pipet collect the results into a nice JSON.  For example, run `pipet --json hackernews.pipet` to a JSON representation of the above results.</details>
+<details><summary>Render to a template</summary>
+
+Add a tepmlate file called `hackernews.tpl` next to your `hackernews.pipet` file with this content:
+```
+<ul>
+  {{range $index, $item := index (index .result 0) 0}}
+    <li>
+  {{index $item 0}} ({{index $item 1}})</li>{{end}}
+</ul>
+
+<p>{{ .timestamp }}</p>
+```
+
+Now run `pipet hackernews.pipet` again and Pipet will automatically detect your template file, and render the results to it.
+</details>
+<details><summary>Use pipes</summary>
+
+Use Unix pipes after your queries, as if they were running in your shell. For example, count the charaters in the title (with `wc`) and extract the full article URL (with [htmlq](https://github.com/mgdm/htmlq)):
+
+```
+curl https://news.ycombinator.com/
+.title .titleline
+  span > a
+  span > a | wc -c
+  .sitebit a
+  .sitebit a | htmlq --attribute href a
+```
+</details>
+<details><summary>Monitor for changes</summary>
+  
+Set an interval and a command to run on change, and have Pipet notify you when something happened. For example, get a notification whenever the Hacker News #1 story is different:
+
+```
+curl https://news.ycombinator.com/
+.title .titleline a
+```
+
+Run it with `pipet --interval 60 --on-change "notify-send {}" hackernews.pipet`
+
+</details>
+
+# Installation
+
+## Pre-built
+Download the latest release from the [Releases](https://github.com/bjesus/pipet/releases/) page. `chmod +x pipet` and run `./pipet`.
+
+## Compile
+You will need to have Go installed for this installation method.
+You can use Go to install Pipet using `go install https://github.com/bjesus/pipet@latest`.  Otherwise you can run it without installing using `go run`.
+
+## Distros
+Packages are currently only available for [Arch Linux](https://aur.archlinux.org/packages/pipet-git).
+
+# Usage
+
+```
+NAME:
+   pipet - swiss-army tool for web scraping, made for hackers
+
+USAGE:
+   pipet [global options] <pipet_file>
+
+GLOBAL OPTIONS:
+   --json, -j                                                   output as JSON (default: false)
+   --template value, -t value                                   path to file for template output
+   --separator value, -s value [ --separator value, -s value ]  set a separator for text output (can be used multiple times)
+   --max-pages value, -p value                                  maximum number of pages to scrape (default: 3)
+   --interval value, -i value                                   rerun pipet after X seconds, 0 to disable (default: 0)
+   --on-change value, -c value                                  a command to run when the pipet result is new
+   --verbose, -v                                                enable verbose logging (default: false)
+   --help, -h                                                   show help
+```
 
 # Pipet files
 Pipet files describe where and how to get the data you are interested in. They are normal text files containing one or more blocks, separated with an empty line. Line beginning with `//` are ignored and can be used for comments. Every block has at least 2 sections - the first line containing the URL and the tool we are using for scraping, and the following lines describing the selectors reaching the data we would like scrap. Some blocks can end with a special last line pointing to the "next page" selector - more on that later.
@@ -88,37 +159,3 @@ people | jq keys
 ```
 
 ## Next page nav
-
-# Running Pipet
-
-## Installation
-
-### Pre-built
-Download the latest release from the Releases page. `chmod +x pipet` and run `./pipet`.
-
-### Compile
-You will need to have Go installed for this installation method.
-You can use Go to install Pipet using `go install https://github.com/bjesus/pipet@latest`.  Otherwise you can run it without installing using `go run`.
-
-### Distros
-Packages are currently only available for Arch Linux.
-
-## Usage
-
-```
-USAGE:
-   pipet [global options] command [command options]
-
-COMMANDS:
-   help, h  Shows a list of commands or help for one command
-
-GLOBAL OPTIONS:
-   --json                                   Output as JSON (default: false)
-   --separator value [ --separator value ]  Separator for text output (can be used multiple times)
-   --template value                         Path to template file for output
-   --max-pages value                        Maximum number of pages to scrape (default: 3)
-   --interval value                         Maximum number of pages to scrape (default: 3)
-   --on-change value                        Path to template file for output
-   --help, -h                               show help
-```
-
