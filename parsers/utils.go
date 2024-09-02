@@ -18,7 +18,7 @@ func ExecuteCurlBlock(block common.Block) (interface{}, error) {
 	}
 
 	// Split the command into curl and its arguments
-	parts, err := shlex.Split(block.Command)
+	parts, _ := shlex.Split(block.Command)
 	log.Println("Execute curl:", block.Command)
 	cmd := exec.Command(parts[0], parts[1:]...)
 	output, err := cmd.Output()
@@ -27,12 +27,12 @@ func ExecuteCurlBlock(block common.Block) (interface{}, error) {
 	}
 
 	isJSON := json.Valid(bytes.TrimSpace(output))
-	log.Println(isJSON)
+
 	if isJSON {
-		log.Println("it's json")
+		log.Println("JSON detected")
 		return ParseJSONQueries(output, block.Queries)
 	} else {
-		log.Println("it's HTM")
+		log.Println("HTML detected")
 		return ParseHTMLQueries(output, block.Queries)
 	}
 }
