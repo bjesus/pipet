@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -15,6 +16,7 @@ import (
 	"github.com/bjesus/pipet/common"
 	"github.com/bjesus/pipet/internal/app"
 	"github.com/bjesus/pipet/outputs"
+	"github.com/bjesus/pipet/utils"
 )
 
 func main() {
@@ -91,6 +93,13 @@ func runPipet(c *cli.Context, specFile string) error {
 
 	if !verbose {
 		log.SetOutput(io.Discard)
+	}
+
+	automaticTemplateFile := strings.TrimSuffix(specFile, filepath.Ext(specFile)) + ".tpl"
+
+	if templateFile == "" && utils.FileExists(automaticTemplateFile) {
+		log.Println("Detected template file at", specFile)
+		templateFile = automaticTemplateFile
 	}
 
 	pipet := &common.PipetApp{

@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/bjesus/pipet/common"
 )
@@ -30,4 +31,9 @@ func GetSeparator(app *common.PipetApp, depth int) string {
 		return app.Separator[depth]
 	}
 	return ", "
+}
+
+func FileExists(path string) bool {
+	_, err := os.Stat(path)
+	return !os.IsNotExist(err)
 }
