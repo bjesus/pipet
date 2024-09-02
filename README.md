@@ -24,7 +24,10 @@ curl https://news.ycombinator.com/
 2. Run `go run github.com/bjesus/pipet/cmd/pipet@latest myfile.pipet`
 3. See all of the latest hacker news in your terminal!
 
-Want it as JSON? Run `go run github.com/bjesus/pipet/cmd/pipet@latest --json myfile.pipet`! Want to template it? See more below.
+<details><summary>Get as JSON</summary>Add the `--json` flag to make Pipet, like `go run github.com/bjesus/pipet/cmd/pipet@latest --json myfile.pipet` or `pipet --json myfile.file`</details>
+<details><summary>Render to a template</summary>Peek a boo!</details>
+<details><summary>Use pipes</summary>Peek a boo!</details>
+<details><summary>Monitor for changes</summary>Peek a boo!</details>
 
 # Pipet files
 Pipet files describe where and how to get the data you are interested in. They are normal text files containing one or more blocks, separated with an empty line. Line beginning with `//` are ignored and can be used for comments. Every block has at least 2 sections - the first line containing the URL and the tool we are using for scraping, and the following lines describing the selectors reaching the data we would like scrap. Some blocks can end with a special last line pointing to the "next page" selector - more on that later.
