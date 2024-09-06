@@ -32,7 +32,7 @@ Use the `--json` flag to make Pipet collect the results into a nice JSON.  For e
 Add a tepmlate file called `hackernews.tpl` next to your `hackernews.pipet` file with this content:
 ```
 <ul>
-  {{range $index, $item := index (index .result 0) 0}}
+  {{range $index, $item := index (index . 0) 0}}
     <li>
   {{index $item 0}} ({{index $item 1}})</li>{{end}}
 </ul>
