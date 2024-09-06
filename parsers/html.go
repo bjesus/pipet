@@ -6,14 +6,14 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func ParseHTMLQueries(htmlData []byte, queries []string) (interface{}, error) {
+func ParseHTMLQueries(htmlData []byte, queries []string, nextPage string) (interface{}, string, error) {
 
 	result := []interface{}{}
 
 	// get new HTML
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(htmlData)))
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	for i, line := range queries {
@@ -39,7 +39,7 @@ func ParseHTMLQueries(htmlData []byte, queries []string) (interface{}, error) {
 			elements.Each(func(subi int, subdoc *goquery.Selection) {
 				html, _ := goquery.OuterHtml(subdoc)
 
-				value2, _ := ParseHTMLQueries([]byte(html), lines)
+				value2, _, _ := ParseHTMLQueries([]byte(html), lines, "")
 				subresult = append(subresult, value2)
 			})
 
@@ -69,5 +69,10 @@ func ParseHTMLQueries(htmlData []byte, queries []string) (interface{}, error) {
 		}
 
 	}
-	return result, nil
+
+	nextPageURL := ""
+	if nextPage != "" {
+		nextPageURL = doc.Find(nextPage).First().AttrOr("href", "")
+	}
+	return result, nextPageURL, nil
 }

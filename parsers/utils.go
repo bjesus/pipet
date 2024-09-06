@@ -12,18 +12,24 @@ import (
 	"github.com/google/shlex"
 )
 
-func ExecuteCurlBlock(block common.Block) (interface{}, error) {
+func ExecuteCurlBlock(block common.Block) (interface{}, string, error) {
 	if !commandExists("curl") {
-		return nil, fmt.Errorf("curl command not found. Please install curl and try again")
+		return nil, "", fmt.Errorf("curl command not found. Please install curl and try again")
 	}
 
-	// Split the command into curl and its arguments
-	parts, _ := shlex.Split(block.Command)
-	log.Println("Execute curl:", block.Command)
+	var parts []string
+	switch cmd := block.Command.(type) {
+	case string:
+		parts, _ = shlex.Split(cmd)
+	case []string:
+		parts = cmd
+	default:
+	}
+
 	cmd := exec.Command(parts[0], parts[1:]...)
 	output, err := cmd.Output()
 	if err != nil {
-		return nil, fmt.Errorf("curl command failed: %w\nOutput: %s", err, string(output))
+		return nil, "", fmt.Errorf("curl command failed: %w\nOutput: %s", err, string(output))
 	}
 
 	isJSON := json.Valid(bytes.TrimSpace(output))
@@ -33,7 +39,7 @@ func ExecuteCurlBlock(block common.Block) (interface{}, error) {
 		return ParseJSONQueries(output, block.Queries)
 	} else {
 		log.Println("HTML detected")
-		return ParseHTMLQueries(output, block.Queries)
+		return ParseHTMLQueries(output, block.Queries, block.NextPage)
 	}
 }
 

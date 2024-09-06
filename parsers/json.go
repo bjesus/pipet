@@ -7,7 +7,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func ParseJSONQueries(jsonData []byte, queries []string) (interface{}, error) {
+func ParseJSONQueries(jsonData []byte, queries []string) (interface{}, string, error) {
 
 	result := []interface{}{}
 
@@ -33,7 +33,7 @@ func ParseJSONQueries(jsonData []byte, queries []string) (interface{}, error) {
 			elements.ForEach(func(subi gjson.Result, subdoc gjson.Result) bool {
 				html := subdoc.String()
 
-				value2, _ := ParseJSONQueries([]byte(html), lines)
+				value2, _, _ := ParseJSONQueries([]byte(html), lines)
 				subresult = append(subresult, value2)
 				return true
 			})
@@ -72,5 +72,5 @@ func ParseJSONQueries(jsonData []byte, queries []string) (interface{}, error) {
 		}
 
 	}
-	return result, nil
+	return result, "", nil
 }

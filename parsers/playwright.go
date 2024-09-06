@@ -31,7 +31,14 @@ func ExecutePlaywrightBlock(block common.Block) (interface{}, error) {
 		return nil, fmt.Errorf("failed to create new page: %w", err)
 	}
 
-	url := strings.TrimPrefix(block.Command, "playwright ")
+	var url string
+
+	switch cmd := block.Command.(type) {
+	case string:
+		url = strings.TrimPrefix(cmd, "playwright ")
+	default:
+	}
+
 	_, err = page.Goto(url, playwright.PageGotoOptions{
 		WaitUntil: playwright.WaitUntilStateNetworkidle,
 	})

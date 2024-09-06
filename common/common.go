@@ -2,7 +2,7 @@ package common
 
 type Block struct {
 	Type     string
-	Command  string
+	Command  interface{}
 	Queries  []string
 	NextPage string
 }
