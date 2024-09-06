@@ -3,6 +3,10 @@ Pipet
 </h1>
 
 <p align="center">
+<a href="https://goreportcard.com/report/github.com/bjesus/pipet"><img src="https://goreportcard.com/badge/github.com/bjesus/pipet" /></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" /></a>
+  <a href="https://pkg.go.dev/github.com/bjesus/pipet"><img src="https://pkg.go.dev/badge/github.com/bjesus/pipet.svg" alt="Go Reference"></a>
+  <br/>
 a swiss-army tool for scraping and extracting data from online assets, made for hackers
 </p>
 <p align="center">
@@ -36,8 +40,6 @@ Add a template file called `hackernews.tpl` next to your `hackernews.pipet` file
     <li>
   {{index $item 0}} ({{index $item 1}})</li>{{end}}
 </ul>
-
-<p>{{ .timestamp }}</p>
 ```
 
 Now run `pipet hackernews.pipet` again and Pipet will automatically detect your template file, and render the results to it.
@@ -78,7 +80,7 @@ This installation method requires Go to be installed on your system.
 You can use Go to install Pipet using `go install https://github.com/bjesus/pipet@latest`.  Otherwise you can run it without installing using `go run`.
 
 ## Distros
-Packages are currently only available for [Arch Linux](https://aur.archlinux.org/packages/pipet-git).
+Packages are currently only available for [Arch Linux](https://aur.archlinux.org/packages/pipet-git) and Homebrew (`brew tap bjesus/pipet && brew install pipet`).
 
 # Usage
 
