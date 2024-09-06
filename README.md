@@ -85,19 +85,19 @@ Packages are currently only available for [Arch Linux](https://aur.archlinux.org
 The only required argument for Pipet is the path to your `.pipet` file. Other than this, the `pipet` command accepts the following flags:
 
 - `--json`, `-j` - Output as JSON (default: false)
--  `--template value`, `-t value` - Specify a path to a template file. You can also simply name the file like your `.pipet` file but with a `.tpl` extension for it to be auto-detected.
--  `--separator value`, `-s value` - Set a separator for text output (can be used multiple times for setting different separators for different levels of data nesting)
--  `---max-pages value`, `-p value` - Maximum number of pages to scrape (default: 3)
--  `--interval value`, `-i value` - Rerun Pipet after X seconds. Use 0 to disable (default: 0)
--  `--on-change value`, `-c value` - A command to run when the pipet result is new
--  `--verbose`, `-v` - Enable verbose logging (default: false)
--  `--help`, `-h` - Show help
+- `--template value`, `-t value` - Specify a path to a template file. You can also simply name the file like your `.pipet` file but with a `.tpl` extension for it to be auto-detected.
+- `--separator value`, `-s value` - Set a separator for text output (can be used multiple times for setting different separators for different levels of data nesting)
+- `---max-pages value`, `-p value` - Maximum number of pages to scrape (default: 3)
+- `--interval value`, `-i value` - Rerun Pipet after X seconds. Use 0 to disable (default: 0)
+- `--on-change value`, `-c value` - A command to run when the pipet result is new
+- `--verbose`, `-v` - Enable verbose logging (default: false)
+- `--help`, `-h` - Show help
 
 # Pipet files
 Pipet files describe where and how to get the data you are interested in. They are normal text files containing one or more blocks separated by an empty line. Lines beginning with `//` are ignored and can be used for comments. Every block can have 3 sections:
 
 1. **Resource** - The first line containing the URL and the tool we are using for scraping
-2. *Queries* - The following lines describing the selectors reaching the data we would like scrap
+2. **Queries** - The following lines describing the selectors reaching the data we would like scrap
 3. **Next page** - An _optional_ last line starting with `>` describing the selector pointing to the "next page" of data
 
 Below is an example Pipet file.
