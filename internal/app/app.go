@@ -4,13 +4,13 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"net/url"
 	"os"
 	"strings"
 
-	"github.com/PuerkitoBio/goquery"
 	"github.com/bjesus/pipet/common"
 	"github.com/bjesus/pipet/parsers"
-	"github.com/tidwall/gjson"
+	"github.com/google/shlex"
 )
 
 func ParseSpecFile(e *common.PipetApp, filename string) error {
@@ -48,7 +48,7 @@ func ParseSpecFile(e *common.PipetApp, filename string) error {
 		} else {
 			if strings.HasPrefix(line, "> ") {
 
-				currentBlock.NextPage = strings.TrimPrefix(line, "> ")
+				currentBlock.NextPage = strings.TrimPrefix(line, ">")
 			} else {
 				currentBlock.Queries = append(currentBlock.Queries, line)
 			}
@@ -67,10 +67,11 @@ func ExecuteBlocks(e *common.PipetApp) error {
 	for _, block := range e.Blocks {
 		var data interface{}
 		var err error
+		var nextPageURL string
 
 		for page := 0; page < e.MaxPages; page++ {
 			if block.Type == "curl" {
-				data, err = parsers.ExecuteCurlBlock(block)
+				data, nextPageURL, err = parsers.ExecuteCurlBlock(block)
 			} else if block.Type == "playwright" {
 				data, err = parsers.ExecutePlaywrightBlock(block)
 			}
@@ -81,52 +82,41 @@ func ExecuteBlocks(e *common.PipetApp) error {
 
 			e.Data = append(e.Data, data)
 
-			if block.NextPage == "" {
-				break
+			var parts []string
+			switch cmd := block.Command.(type) {
+			case string:
+				parts, _ = shlex.Split(cmd)
+			case []string:
+				parts = cmd
+			default:
 			}
 
-			nextURL, err := getNextPageURL(block, data)
-			if err != nil {
-				return err
+			for i, u := range parts {
+				if len(u) >= 4 && u[:4] == "http" {
+					parts[i] = concatenateURLs(parts[i], nextPageURL)
+					break
+				}
 			}
 
-			block.Command = strings.Replace(block.Command, block.Command[strings.Index(block.Command, " ")+1:], nextURL, 1)
+			block.Command = parts
 		}
 	}
 
 	return nil
 }
 
-func getNextPageURL(block common.Block, data interface{}) (string, error) {
-	parts := strings.Split(block.NextPage, "|")
-	selector := strings.TrimSpace(parts[0])
-
-	var nextURL string
-
-	if block.Type == "curl" {
-		if strings.HasPrefix(selector, ".") {
-			// JSON mode
-			nextURL = gjson.Get(fmt.Sprintf("%v", data), selector).String()
-		} else {
-			// HTML mode
-			doc, err := goquery.NewDocumentFromReader(strings.NewReader(fmt.Sprintf("%v", data)))
-			if err != nil {
-				return "", err
-			}
-			nextURL, _ = doc.Find(selector).Attr("href")
-		}
-	} else if block.Type == "playwright" {
-		// TODO: Implement Playwright next page logic
-		return "", fmt.Errorf("playwright next page not implemented")
+func concatenateURLs(base, ref string) string {
+	baseURL, err := url.Parse(base)
+	if err != nil {
+		panic(err)
+	}
+	refURL, err := url.Parse(ref)
+	if err != nil {
+		panic(err)
 	}
 
-	if len(parts) > 1 {
-		pipedURL, err := parsers.ExecutePipe(nextURL, strings.TrimSpace(parts[1]))
-		if err != nil {
-			return "", err
-		}
-		nextURL = strings.TrimSpace(pipedURL)
-	}
+	// Resolve reference URL relative to the base URL
+	fullURL := baseURL.ResolveReference(refURL)
 
-	return nextURL, nil
+	return fullURL.String()
 }
