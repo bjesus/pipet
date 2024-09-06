@@ -97,7 +97,7 @@ func runPipet(c *cli.Context, specFile string) error {
 
 	automaticTemplateFile := strings.TrimSuffix(specFile, filepath.Ext(specFile)) + ".tpl"
 
-	if templateFile == "" && utils.FileExists(automaticTemplateFile) {
+	if !jsonOutput && templateFile == "" && utils.FileExists(automaticTemplateFile) {
 		log.Println("Detected template file at", specFile)
 		templateFile = automaticTemplateFile
 	}
