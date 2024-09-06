@@ -44,7 +44,7 @@ Now run `pipet hackernews.pipet` again and Pipet will automatically detect your 
 </details>
 <details><summary>Use pipes</summary>
 
-Use Unix pipes after your queries, as if they were running in your shell. For example, count the charaters in the title (with `wc`) and extract the full article URL (with [htmlq](https://github.com/mgdm/htmlq)):
+Use Unix pipes after your queries, as if they were running in your shell. For example, count the charaters in each title (with `wc`) and extract the full article URL (with [htmlq](https://github.com/mgdm/htmlq)):
 
 ```
 curl https://news.ycombinator.com/
@@ -82,23 +82,16 @@ Packages are currently only available for [Arch Linux](https://aur.archlinux.org
 
 # Usage
 
-```
-NAME:
-   pipet - swiss-army tool for web scraping, made for hackers
+The only required argument for Pipet is the path to your `.pipet` file. Other than this, the `pipet` command accepts the following flags:
 
-USAGE:
-   pipet [global options] <pipet_file>
-
-GLOBAL OPTIONS:
-   --json, -j                                                   output as JSON (default: false)
-   --template value, -t value                                   path to file for template output
-   --separator value, -s value [ --separator value, -s value ]  set a separator for text output (can be used multiple times)
-   --max-pages value, -p value                                  maximum number of pages to scrape (default: 3)
-   --interval value, -i value                                   rerun pipet after X seconds, 0 to disable (default: 0)
-   --on-change value, -c value                                  a command to run when the pipet result is new
-   --verbose, -v                                                enable verbose logging (default: false)
-   --help, -h                                                   show help
-```
+- `--json`, `-j` - Output as JSON (default: false)
+-  `--template value`, `-t value` - Specify a path to a template file. You can also simply name the file like your `.pipet` file but with a `.tpl` extension for it to be auto-detected.
+-  `--separator value`, `-s value` - Set a separator for text output (can be used multiple times for setting different separators for different levels of data nesting)
+-  `---max-pages value`, `-p value` - Maximum number of pages to scrape (default: 3)
+-  `--interval value`, `-i value` - Rerun pipet after X seconds. Use 0 to disable (default: 0)
+-  `--on-change value`, `-c value` - A command to run when the pipet result is new
+-  `--verbose`, `-v` - Enable verbose logging (default: false)
+-  `--help`, `-h` - Show help
 
 # Pipet files
 Pipet files describe where and how to get the data you are interested in. They are normal text files containing one or more blocks, separated with an empty line. Line beginning with `//` are ignored and can be used for comments. Every block has at least 2 sections - the first line containing the URL and the tool we are using for scraping, and the following lines describing the selectors reaching the data we would like scrap. Some blocks can end with a special last line pointing to the "next page" selector - more on that later.
