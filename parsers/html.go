@@ -46,7 +46,7 @@ func ParseHTMLQueries(htmlData []byte, queries []string, nextPage string) ([]int
 
 				if len(value2) == 1 {
 					subresult = append(subresult, value2[0])
-				} else {
+				} else if len(value2) > 1 {
 					subresult = append(subresult, value2)
 				}
 
