@@ -82,6 +82,9 @@ func ExecuteBlocks(e *common.PipetApp) error {
 
 			e.Data = append(e.Data, data)
 
+			if nextPageURL == "" {
+				break
+			}
 			var parts []string
 			switch cmd := block.Command.(type) {
 			case string:
