@@ -21,7 +21,7 @@ func ParseHTMLQueries(htmlData []byte, queries []string, nextPage string) (inter
 		indentation := CalculateIndentation(line)
 		if len(queries) > i+1 && CalculateIndentation(queries[i+1]) > indentation {
 			// if line has children
-			elements := doc.Find(" " + line)
+			elements := doc.Find(line)
 
 			// get new lines
 			var lines []string
@@ -39,6 +39,9 @@ func ParseHTMLQueries(htmlData []byte, queries []string, nextPage string) (inter
 			elements.Each(func(subi int, subdoc *goquery.Selection) {
 				html, _ := goquery.OuterHtml(subdoc)
 
+				if strings.HasPrefix(html, "<tr") || strings.HasPrefix(html, "<td") {
+					html = "<table>" + html + "</table>"
+				}
 				value2, _, _ := ParseHTMLQueries([]byte(html), lines, "")
 				subresult = append(subresult, value2)
 			})
