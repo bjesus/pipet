@@ -6,7 +6,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func ParseHTMLQueries(htmlData []byte, queries []string, nextPage string) (interface{}, string, error) {
+func ParseHTMLQueries(htmlData []byte, queries []string, nextPage string) ([]interface{}, string, error) {
 
 	result := []interface{}{}
 
@@ -43,7 +43,13 @@ func ParseHTMLQueries(htmlData []byte, queries []string, nextPage string) (inter
 					html = "<table>" + html + "</table>"
 				}
 				value2, _, _ := ParseHTMLQueries([]byte(html), lines, "")
-				subresult = append(subresult, value2)
+
+				if len(value2) == 1 {
+					subresult = append(subresult, value2[0])
+				} else {
+					subresult = append(subresult, value2)
+				}
+
 			})
 
 			result = append(result, subresult)

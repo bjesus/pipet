@@ -125,6 +125,7 @@ func runPipet(c *cli.Context, specFile string) error {
 		}
 
 		log.Println("Generating output")
+
 		if jsonOutput {
 			newValue = outputs.OutputJSON(pipet)
 		} else if templateFile != "" {
