@@ -37,8 +37,8 @@ Add a template file called `hackernews.tpl` next to your `hackernews.pipet` file
 ```
 <ul>
   {{range $index, $item := index (index . 0) 0}}
-    <li>
-  {{index $item 0}} ({{index $item 1}})</li>{{end}}
+    <li>{{index $item 0}} ({{index $item 1}})</li>
+  {{end}}
 </ul>
 ```
 
