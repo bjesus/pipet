@@ -87,5 +87,6 @@ func ParseHTMLQueries(htmlData []byte, queries []string, nextPage string) ([]int
 	if nextPage != "" {
 		nextPageURL = doc.Find(nextPage).First().AttrOr("href", "")
 	}
+
 	return result, nextPageURL, nil
 }
