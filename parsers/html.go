@@ -52,10 +52,14 @@ func ParseHTMLQueries(htmlData []byte, queries []string, nextPage string) ([]int
 
 			})
 
-			result = append(result, subresult)
+			// result = append(result, subresult)
+			// Only append non-empty results
+			if len(subresult) > 0 {
+				result = append(result, subresult)
+			}
 		} else if indentation == 0 {
 			parts := strings.Split(line, "|")
-			elements := doc.Find(" " + parts[0])
+			elements := doc.Find(parts[0])
 			value := elements.First()
 
 			html := ""
