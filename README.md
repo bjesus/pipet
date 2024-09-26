@@ -143,7 +143,7 @@ Query lines define 3 things:
 Pipet uses 3 different query types - for HTML, for JSON, and for when loading pages with Playwright.
 
 ### HTML Queries
-HTML Queries use CSS Selectors to select specific elements. Whitespace nesting is used for iterations - parent lines will run as iterators, making their children lines run for each occurance of the parent selector. This means that you can use nesting to determine the structure of your final output. See the following 3 examples:
+HTML Queries use CSS Selectors to select specific elements. Whitespace nesting is used for iterations - parent lines will run as iterators, making their children lines run for each occurrence of the parent selector. This means that you can use nesting to determine the structure of your final output. See the following 3 examples:
 
 <details><summary>Get only the first title and first URL</summary>
   
@@ -179,7 +179,7 @@ By default, Pipet will return the `innerText` of your elements. If you need to a
 
 ### JSON Queries
 
-JSON Queries use the [GJSON syntax](https://github.com/tidwall/gjson/blob/master/SYNTAX.md) to select specific elements. Here too, whitespace nesting is used for iterations - parent lines will run as iterators, making their children lines run for each occurance of the parent selector. If you don't like GJSON, that's okay. For example, you can use `jq` by passing parts or the complete JSON to it using Unix pipes, like `@this | jq '.[].firstName'`.
+JSON Queries use the [GJSON syntax](https://github.com/tidwall/gjson/blob/master/SYNTAX.md) to select specific elements. Here too, whitespace nesting is used for iterations - parent lines will run as iterators, making their children lines run for each occurrence of the parent selector. If you don't like GJSON, that's okay. For example, you can use `jq` by passing parts or the complete JSON to it using Unix pipes, like `@this | jq '.[].firstName'`.
 
 When using pipes, Pipet will attempt to parse the returned string. If it's valid JSON, it will be parsed and injected as an object into the Pipet result.
 
