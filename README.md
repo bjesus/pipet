@@ -80,7 +80,7 @@ This installation method requires Go to be installed on your system.
 You can use Go to install Pipet using `go install https://github.com/bjesus/pipet@latest`.  Otherwise you can run it without installing using `go run`.
 
 ## Distros
-Packages are currently only available for [Arch Linux](https://aur.archlinux.org/packages/pipet-git) and Homebrew (`brew tap bjesus/pipet && brew install pipet`).
+Packages are currently available for [Arch Linux](https://aur.archlinux.org/packages/pipet-git), Homebrew (`brew tap bjesus/pipet && brew install pipet`), and [Nix](https://search.nixos.org/packages?channel=unstable&show=pipet&from=0&size=50&sort=relevance&type=packages&query=pipet).
 
 # Usage
 
