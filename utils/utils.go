@@ -3,32 +3,51 @@ package utils
 import (
 	"fmt"
 	"os"
+	"reflect"
+	"strconv"
+	"strings"
 
 	"github.com/bjesus/pipet/common"
 )
 
-func FlattenData(data interface{}, depth int) []string {
-	var result []string
+func FlattenNestedSlices(app *common.PipetApp, data interface{}, level int) string {
+	v := reflect.ValueOf(data)
 
-	switch v := data.(type) {
-	case []interface{}:
-		for _, item := range v {
-			result = append(result, FlattenData(item, depth+1)...)
-		}
-	case map[string]interface{}:
-		for _, value := range v {
-			result = append(result, FlattenData(value, depth+1)...)
-		}
-	default:
-		result = append(result, fmt.Sprintf("%v", v))
+	if v.Kind() != reflect.Slice {
+		return fmt.Sprint(data)
 	}
 
-	return result
+	var result []string
+
+	for i := 0; i < v.Len(); i++ {
+		elem := v.Index(i).Interface()
+		flattened := FlattenNestedSlices(app, elem, level+1)
+		result = append(result, flattened)
+	}
+
+	sep := GetSeparator(app, level)
+	return strings.Join(result, sep)
+}
+
+func RemoveUnnecessaryNesting(data interface{}) interface{} {
+	for {
+		val := reflect.ValueOf(data)
+		if val.Kind() == reflect.Slice && val.Len() == 1 {
+			firstElem := val.Index(0).Interface()
+			if reflect.ValueOf(firstElem).Kind() == reflect.Slice {
+				data = firstElem
+				continue
+			}
+		}
+		break
+	}
+	return data
 }
 
 func GetSeparator(app *common.PipetApp, depth int) string {
 	if depth < len(app.Separator) {
-		return app.Separator[depth]
+		sep, _ := strconv.Unquote(`"` + app.Separator[depth] + `"`)
+		return sep
 	}
 	return ", "
 }
