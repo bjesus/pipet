@@ -28,9 +28,12 @@ curl https://news.ycombinator.com/
 2. Run `go run github.com/bjesus/pipet/cmd/pipet@latest hackernews.pipet` or install Pipet and run `pipet hackernews.pipet`
 3. See all of the latest hacker news in your terminal!
 
+<details><summary>Use custom separators</summary>
+  
+Use the `--separator` (or `-s`) flag to specify custom separators for text output.  For example, run `pipet -s "\n" -s "->" hackernews.pipet` to see each item in a new line, with `->` between the title and the domain.</details>
 <details><summary>Get as JSON</summary>
   
-Use the `--json` flag to make Pipet collect the results into a nice JSON.  For example, run `pipet --json hackernews.pipet` to a JSON representation of the above results.</details>
+Use the `--json` flag to make Pipet collect the results into a nice JSON.  For example, run `pipet --json hackernews.pipet` to get a JSON representation of the above results.</details>
 <details><summary>Render to a template</summary>
 
 Add a template file called `hackernews.tpl` next to your `hackernews.pipet` file with this content:
