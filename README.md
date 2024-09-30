@@ -186,9 +186,59 @@ JSON Queries use the [GJSON syntax](https://github.com/tidwall/gjson/blob/master
 
 When using pipes, Pipet will attempt to parse the returned string. If it's valid JSON, it will be parsed and injected as an object into the Pipet result.
 
+<details><summary>Querying and jq usage</summary>
+  
+The example below will return the latest water temperature in Amsterdam NDSM, and then pipe the complete JSON to `jq` so it will combine the coordinates of the reading into one field.
+
+```
+curl https://waterinfo.rws.nl/api/detail/get?locationSlug=NDSM-werf-(o)(NDS1)&mapType=watertemperatuur
+latest.data
+@this | jq -r '"\(.coordinatex), \(.coordinatey)"'
+```
+
+</details><details><summary>Iterations</summary>
+  
+This will return times for bus deparatures. Note the two types of iterations - the first line is GJSON query that returns the `ExpectedDepartureTime` for each trip, while the the following lines iterates over each trip object using the nested lines below it, allowing us to return multiple keys - `ExpectedDepartureTime` & `TripStopStatus`.
+
+```
+curl http://v0.ovapi.nl/tpc/30005093
+30005093.Passes.@values.#.ExpectedDepartureTime
+30005093.Passes.@values
+  ExpectedDepartureTime
+  TripStopStatus
+```
+
+</details><details><summary>CSV export</summary>
+  
+We can create a simple CSV file by using the previous iteration and configurating a separator
+
+```
+curl http://v0.ovapi.nl/tpc/30005093
+30005093.Passes.@values
+  ExpectedDepartureTime
+  TripStopStatus
+```
+
+Run using `pipet -s '\n' water.pipet > output.csv` to generate a CSV file.
+
+</details>
+
 ### Playwright Queries
 
 Playwright Queries are different and do not use whitespace nesting. Instead, queries here are simply JavaScript code that will be evaluated after the webpage loaded. If the JavaScript code returns something that can be serialized as JSON, it will be included in Pipet's output. Otherwise, you can write JavaScript that will click, scroll or perform any other action you might want.
+
+<details><summary>Simple Playwright example</summary>
+
+This example will return a string like `80 stars, 2 watching, 2 forks` after visiting the Pipet repo on Github.
+
+```
+playwright https://github.com/bjesus/pipet
+Array.from(document.querySelectorAll('.about-margin .Link')).map(e => e.innerText.trim()).filter(t=> /^\d/.test(t) )
+```
+
+Note that if you copy the second line and paste it in your browser console while visiting https://github.com/bjesus/pipet, you'd get exactly the same result. The vice-versa is also true - if your code worked in the browser, it should work in Pipet too.
+
+</details>
 
 ## Next page
 
@@ -201,4 +251,4 @@ curl https://news.ycombinator.com/
 > a.morelink
 ```
 
-The Next Page line is currently only available when processing HTML files.
+The Next Page line is currently only available when working with `curl` and HTML files.
