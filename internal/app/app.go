@@ -38,11 +38,14 @@ func ParseSpecFile(e *common.PipetApp, filename string) error {
 			continue
 		}
 		if currentBlock == nil {
-			if strings.HasPrefix(line, "curl ") {
-				currentBlock = &common.Block{Type: "curl", Command: line}
-			} else if strings.HasPrefix(line, "playwright ") {
-				currentBlock = &common.Block{Type: "playwright", Command: line}
-			} else {
+			switch {
+			case strings.HasPrefix(line, fmt.Sprintf("%s ", parsers.BlockTypeCurl.LinePrefix)):
+				currentBlock = &common.Block{Type: parsers.BlockTypeCurl, Command: line}
+			case strings.HasPrefix(line, fmt.Sprintf("%s ", parsers.BlockTypePlaywright.LinePrefix)):
+				currentBlock = &common.Block{Type: parsers.BlockTypePlaywright, Command: line}
+			case strings.HasPrefix(line, fmt.Sprintf("%s ", parsers.BlockTypeZenRows.LinePrefix)):
+				currentBlock = &common.Block{Type: parsers.BlockTypeZenRows, Command: line}
+			default:
 				return fmt.Errorf("invalid block start: %s", line)
 			}
 		} else {
@@ -70,10 +73,15 @@ func ExecuteBlocks(e *common.PipetApp) error {
 		var nextPageURL string
 
 		for page := 0; page < e.MaxPages; page++ {
-			if block.Type == "curl" {
-				data, nextPageURL, err = parsers.ExecuteCurlBlock(block)
-			} else if block.Type == "playwright" {
-				data, err = parsers.ExecutePlaywrightBlock(block)
+			switch block.Type.Name {
+			case parsers.BlockTypeCurl.Name:
+				data, nextPageURL, err = block.Handle()
+			case parsers.BlockTypePlaywright.Name:
+				data, _, err = block.Handle()
+			case parsers.BlockTypeZenRows.Name:
+				data, nextPageURL, err = block.Handle()
+			default:
+				return fmt.Errorf("unknown block type: %s", block.Type.Name)
 			}
 
 			if err != nil {

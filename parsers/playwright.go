@@ -8,27 +8,33 @@ import (
 	"github.com/playwright-community/playwright-go"
 )
 
-func ExecutePlaywrightBlock(block common.Block) (interface{}, error) {
+var BlockTypePlaywright = common.BlockType{
+	Name:       "playwright",
+	LinePrefix: "playwright",
+	Handler:    ExecutePlaywrightBlock,
+}
+
+func ExecutePlaywrightBlock(block common.Block) (interface{}, string, error) {
 	err := playwright.Install()
 	if err != nil {
-		return nil, fmt.Errorf("failed to install playwright: %w", err)
+		return nil, "", fmt.Errorf("failed to install playwright: %w", err)
 	}
 
 	pw, err := playwright.Run()
 	if err != nil {
-		return nil, fmt.Errorf("failed to start playwright: %w", err)
+		return nil, "", fmt.Errorf("failed to start playwright: %w", err)
 	}
 	defer pw.Stop()
 
 	browser, err := pw.Chromium.Launch()
 	if err != nil {
-		return nil, fmt.Errorf("failed to launch browser: %w", err)
+		return nil, "", fmt.Errorf("failed to launch browser: %w", err)
 	}
 	defer browser.Close()
 
 	page, err := browser.NewPage()
 	if err != nil {
-		return nil, fmt.Errorf("failed to create new page: %w", err)
+		return nil, "", fmt.Errorf("failed to create new page: %w", err)
 	}
 
 	var url string
@@ -43,7 +49,7 @@ func ExecutePlaywrightBlock(block common.Block) (interface{}, error) {
 		WaitUntil: playwright.WaitUntilStateNetworkidle,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to navigate to %s: %w", url, err)
+		return nil, "", fmt.Errorf("failed to navigate to %s: %w", url, err)
 	}
 
 	var result []interface{}
@@ -54,13 +60,13 @@ func ExecutePlaywrightBlock(block common.Block) (interface{}, error) {
 
 		value, err := page.Evaluate(jsQuery)
 		if err != nil {
-			return nil, fmt.Errorf("failed to evaluate JavaScript: %w", err)
+			return nil, "", fmt.Errorf("failed to evaluate JavaScript: %w", err)
 		}
 
 		if len(parts) > 1 {
 			pipedValue, err := ExecutePipe(fmt.Sprintf("%v", value), strings.TrimSpace(parts[1]))
 			if err != nil {
-				return nil, fmt.Errorf("failed to execute pipe: %w", err)
+				return nil, "", fmt.Errorf("failed to execute pipe: %w", err)
 			}
 			result = append(result, pipedValue)
 		} else {
@@ -68,5 +74,5 @@ func ExecutePlaywrightBlock(block common.Block) (interface{}, error) {
 		}
 	}
 
-	return result, nil
+	return result, "", nil
 }

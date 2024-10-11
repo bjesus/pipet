@@ -8,13 +8,12 @@ import (
 )
 
 func TestExecutePlaywrightBlock(t *testing.T) {
-
 	block := common.Block{
-		Type:    "playwright",
+		Type:    BlockTypePlaywright,
 		Command: "playwright http://example.com",
 		Queries: []string{"document.querySelector(\"h1\").innerText.split(\" \")", "document.querySelector(\"h1\") | wc -c"},
 	}
-	result, err := ExecutePlaywrightBlock(block)
+	result, _, err := ExecutePlaywrightBlock(block)
 	expected := []interface{}{[]interface{}{"Example", "Domain"}, "11\n"}
 
 	assert.NoError(t, err)
