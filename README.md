@@ -96,6 +96,7 @@ The only required argument for Pipet is the path to your `.pipet` file. Other th
 - `--interval value`, `-i value` - Rerun Pipet after X seconds. Use 0 to disable (default: 0)
 - `--on-change value`, `-c value` - A command to run when the pipet result is new
 - `--verbose`, `-v` - Enable verbose logging (default: false)
+- `--version` - Print the Pipet version
 - `--help`, `-h` - Show help
 
 # Pipet files
