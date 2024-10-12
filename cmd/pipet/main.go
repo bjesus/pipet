@@ -21,14 +21,19 @@ import (
 
 func main() {
 	log.SetFlags(log.Lshortfile | log.Ltime)
-
+	cli.VersionFlag = &cli.BoolFlag{
+		Name:  "version",
+		Usage: "print the pipet version",
+	}
 	app := &cli.App{
 		Name:                   "pipet",
 		Usage:                  "swiss-army tool for web scraping, made for hackers",
 		HideHelpCommand:        true,
 		UseShortOptionHandling: true,
 		EnableBashCompletion:   true,
+		Version:                "0.3.0",
 		ArgsUsage:              "<pipet_file>",
+
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
 				Name:    "json",
@@ -78,6 +83,7 @@ func main() {
 	}
 
 	if err := app.Run(os.Args); err != nil {
+		log.Println("pipet version", app.Version)
 		log.Fatal(err)
 	}
 }
